@@ -20,6 +20,8 @@ class ModernCampusNav(ctk.CTk):
         
         self.graph = build_graph(nodes, edges) # initialize graph
 
+        visible_nodes = [n for n in nodes if not n.startswith("N")]
+
         # grid layout
         self.grid_columnconfigure(1, weight=1) # right side map resizes automatically
         self.grid_rowconfigure(0, weight=1)
@@ -36,14 +38,14 @@ class ModernCampusNav(ctk.CTk):
         # start point 
         self.label_start = ctk.CTkLabel(self.sidebar_frame, text="選擇起點:", anchor="w")
         self.label_start.pack(padx=20, pady=(10, 0), fill="x")
-        self.start_combo = ctk.CTkComboBox(self.sidebar_frame, values=nodes)
+        self.start_combo = ctk.CTkComboBox(self.sidebar_frame, values=visible_nodes)
         self.start_combo.pack(padx=20, pady=5)
-        self.start_combo.set(nodes[0]) #default
+        self.start_combo.set(visible_nodes[0]) #default
 
         # End point 
         self.label_end = ctk.CTkLabel(self.sidebar_frame, text="選擇終點:", anchor="w")
         self.label_end.pack(padx=20, pady=(10, 0), fill="x")
-        self.end_combo = ctk.CTkComboBox(self.sidebar_frame, values=nodes)
+        self.end_combo = ctk.CTkComboBox(self.sidebar_frame, values=visible_nodes)
         self.end_combo.pack(padx=20, pady=5)
         self.end_combo.set(nodes[1]) #default
 
@@ -99,12 +101,7 @@ class ModernCampusNav(ctk.CTk):
         else:
             header = f"起點: {start}\n終點: {end}\n距離: {total_dist} m\n\n"
             self.result_text.insert("end", header)
-            self.result_text.insert("end", "路徑規劃:\n")
-            for i, node in enumerate(path):
-                if i == len(path) - 1:
-                    self.result_text.insert("end", f"{node}")
-                else:
-                    self.result_text.insert("end", f"{node} ⭢ ")
+
         
         self.result_text.configure(state="disabled")
 
@@ -126,10 +123,13 @@ class ModernCampusNav(ctk.CTk):
             points = get_plot_points(u, v)
             xs = [p[0] for p in points]
             ys = [p[1] for p in points]
-            self.ax.plot(xs, ys, color='#555555', linestyle='-', linewidth=1, alpha=0.5)
+            self.ax.plot(xs, ys, color='#FF0000', linestyle='-', linewidth=1, alpha=0.5)
 
         # draw rectangles
         for name in nodes:
+            if name.startswith("N"):
+                continue  # skip invisible nodes
+
             cx, cy = positions[name]  # center x,y
             
             w, h = node_dims.get(name, (1, 1)) #if not set, default is (1,1)
@@ -164,7 +164,7 @@ class ModernCampusNav(ctk.CTk):
                 py = [p[1] for p in points]
                 self.ax.plot(px, py, color='#00ffcc', linestyle='-', linewidth=4, alpha=0.8, zorder=4)
 
-        self.ax.set_title("Campus Map", color='white', pad=20)
+        self.ax.set_title("Campus Map", fontsize=24, color='white', pad=20)
         self.ax.axis('off')
         
         self.ax.set_aspect('equal') # ratio 1:1
@@ -176,4 +176,3 @@ class ModernCampusNav(ctk.CTk):
 if __name__ == "__main__":
     app = ModernCampusNav()
     app.mainloop()
-
