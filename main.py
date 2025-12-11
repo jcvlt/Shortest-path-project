@@ -1,4 +1,3 @@
-# main.py
 from graph_data import nodes, edges, positions, categories
 from dijkstra import build_graph, dijkstra, reconstruct_path
 from plotting import plot_graph_and_path
@@ -55,4 +54,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
