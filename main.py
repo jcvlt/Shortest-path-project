@@ -6,7 +6,7 @@ from plotting import plot_graph_and_path
 
 
 def print_menu():
-    print("=== 台科大校園最短路徑查詢系統 ===")
+    print("=== NTUST Campus Shortest Path Finder ===")
     for i, name in enumerate(nodes):
         print(f"{i:2d}. {name}")
     print()
@@ -19,17 +19,17 @@ def main():
         print_menu()
 
         try:
-            start_idx = int(input("請輸入起點編號（-1 結束）："))
+            start_idx = int(input("Enter the start point（-1 to exit）："))
             if start_idx == -1:
-                print("程式結束，再見！")
+                print("Program finished.")
                 break
-            end_idx = int(input("請輸入終點編號："))
+            end_idx = int(input("Enter the destination point："))
         except ValueError:
-            print("請輸入整數。\n")
+            print("Please enter an integer value.\n")
             continue
 
         if not (0 <= start_idx < len(nodes) and 0 <= end_idx < len(nodes)):
-            print("編號範圍錯誤。\n")
+            print("Invalid number.\n")
             continue
 
         start = nodes[start_idx]
@@ -39,19 +39,20 @@ def main():
         path = reconstruct_path(prev, start, end)
 
         if not path:
-            print(f"從 {start} 到 {end} 無路徑\n")
+            print(f"No path from {start} to {end}.\n")
             continue
 
-        print("\n=== 最短路徑結果 ===")
-        print("起點：", start)
-        print("終點：", end)
-        print("路徑：", " → ".join(path))
-        print("總距離：", dist[end], "m\n")
+        print("\n=== Shortest Path ===")
+        print("Start：", start)
+        print("Destination：", end)
+        print("Path：", " → ".join(path))
+        print("Distance：", dist[end], "m\n")
 
-        show = input("顯示地圖結果？(y/n)：").lower()
+        show = input("Show map？(y/n)：").lower()
         if show == 'y':
             plot_graph_and_path(nodes, edges, positions, path)
 
 
 if __name__ == "__main__":
     main()
+
