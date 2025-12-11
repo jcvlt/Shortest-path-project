@@ -45,6 +45,7 @@ edges = [
     ("TR", "IA", 1),
     ("Gym", "IA", 1),
     ("Gym", "S", 1),
+    ("Caf1", "Court", 1)
 ]
 
 edge_waypoints = {
@@ -76,6 +77,7 @@ edge_waypoints = {
     tuple(sorted(("E1", "Caf1"))): [(-6, 10.5)],
     tuple(sorted(("TR", "Court"))): [(-19, 5)],
     tuple(sorted(("IA", "Gym"))): [(-17, 11)],
+    tuple(sorted(("Court", "Caf1"))): [(-14, 10.5)],
 }
 
 positions = {
