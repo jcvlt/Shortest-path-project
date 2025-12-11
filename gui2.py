@@ -164,7 +164,7 @@ class ModernCampusNav(ctk.CTk):
                 py = [p[1] for p in points]
                 self.ax.plot(px, py, color='#00ffcc', linestyle='-', linewidth=4, alpha=0.8, zorder=4)
 
-        self.ax.set_title("Campus Map (Rectangular Buildings)", color='white', pad=20)
+        self.ax.set_title("Campus Map", color='white', pad=20)
         self.ax.axis('off')
         
         self.ax.set_aspect('equal') # ratio 1:1
@@ -176,3 +176,4 @@ class ModernCampusNav(ctk.CTk):
 if __name__ == "__main__":
     app = ModernCampusNav()
     app.mainloop()
+
