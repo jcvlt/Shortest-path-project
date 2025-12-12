@@ -193,32 +193,47 @@ node_dims = {
 
 categories = {
     "MainGate": "gate",
+
     "AD": "admin",
+    "S": "admin",
+    "Gym": "admin",
+    "IB": "admin",
+    "T3": "admin",
+    "IA": "admin",
+
+    "T1": "academic1",
+    "T2": "academic1",
+    "T4": "academic1",
+
+    "E1": "academic2",
+    "E2": "academic2",
+    "EE": "academic2",
+
+    "MA": "academic3",
+    "RB": "academic3",
+    "TR": "academic3",
+
     "Library": "public",
-    "S": "public",
     "AU": "public",
 
-    "IB": "teaching",
-    "T1": "teaching",
-    "T2": "teaching",
-    "T3": "teaching",
-    "T4": "teaching",
-    "E1": "teaching",
-    "E2": "teaching",
-    "EE": "teaching",
-    "MA": "teaching",
-
-    "RB": "research",
-    "TR": "research",
-    "IA": "research",
-
-    "Gym": "sport",
-    "Court": "sport",
+    "Caf1": "cafeteria",
+    "Caf3": "cafeteria",
 
     "Dorm1": "dorm",
     "Dorm2": "dorm",
     "Dorm3": "dorm",
 
-    "Caf1": "cafeteria",
-    "Caf3": "cafeteria",
+    "Court": "sport"
+}
+
+color_map = {
+    "gate": "black",
+    "admin": "#9B6B6B",
+    "academic1": "#7E6A86",
+    "academic2": "#5F6F7A",
+    "academic3": "#5E7C7A",
+    "public": "#6F7F6A",
+    "cafeteria": "#7A7A5E",
+    "dorm": "#8A7A6A",
+    "sport": "#5C4F5A"
 }
