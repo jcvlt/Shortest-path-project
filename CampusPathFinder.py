@@ -4,9 +4,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
 
-from graph_data import nodes, edges, positions, categories, edge_waypoints, node_dims
+from graph_data import nodes, edges, positions, categories, edge_waypoints, node_dims, color_map
 from dijkstra import build_graph, dijkstra, reconstruct_path
-from plotting import color_map
 
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
@@ -123,7 +122,7 @@ class ModernCampusNav(ctk.CTk):
             points = get_plot_points(u, v)
             xs = [p[0] for p in points]
             ys = [p[1] for p in points]
-            self.ax.plot(xs, ys, color='#FF0000', linestyle='-', linewidth=1, alpha=0.5)
+            self.ax.plot(xs, ys, color='#FFFFFF', linestyle='-', linewidth=1, alpha=0.5)
 
         # draw rectangles
         for name in nodes:
@@ -162,7 +161,7 @@ class ModernCampusNav(ctk.CTk):
                 points = get_plot_points(u, v)
                 px = [p[0] for p in points]
                 py = [p[1] for p in points]
-                self.ax.plot(px, py, color='#00ffcc', linestyle='-', linewidth=4, alpha=0.8, zorder=4)
+                self.ax.plot(px, py, color='#FF0000', linestyle='-', linewidth=4, alpha=0.8, zorder=4)
 
         self.ax.set_title("Campus Map", fontsize=24, color='white', pad=20)
         self.ax.axis('off')
