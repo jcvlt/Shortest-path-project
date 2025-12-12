@@ -1,177 +1,242 @@
-import customtkinter as ctk
-from tkinter import messagebox
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
-from matplotlib.patches import Rectangle
+nodes = [
+    "MainGate", "AD", "AU", "IB", "T1", "T2", "T3", "T4",
+    "E1", "E2", "EE", "MA", "S", "Library", "Gym",
+    "Court", "IA", "Dorm1", "Dorm2", "Dorm3", "RB",
+    "TR", "Caf1", "Caf3", "Home",
 
-from graph_data import nodes, edges, positions, categories, edge_waypoints, node_dims, color_map
-from dijkstra import build_graph, dijkstra, reconstruct_path
+    "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9", "N10", "N11", "N12", "N13", "N14", "N15", "N16", "N17", "N18", "N19", "N20",
+    "N21", "N22", "N23", "N24", "N25", "N26", "N27", "N28", "N29", "N30", "N31", "N32", "N33", "N34", "N35", "N36", "N37"
+]
 
-ctk.set_appearance_mode("Dark")
-ctk.set_default_color_theme("blue")
+edges = [
+    ("MainGate", "N1", 1),
+    ("N1", "N2", 2.5),
+    ("N2", "N3", 1.5),
+    ("N3", "IB", 0.5),
+    ("N3", "N4", 2.5),
+    ("N4", "N11", 2.5),
+    ("N11", "N16", 2),
+    ("N16", "N15", 2),
+    ("N15", "N14", 2),
+    ("N14", "N1", 2),
+    ("N15", "Library", 1),
+    ("N16", "N17", 0.5),
+    ("N11", "AD", 1),
+    ("AD", "N12", 1),
+    ("N4", "N5", 4),
+    ("IB", "E2", 6),
+    ("E2", "N6", 0.5),
+    ("N6", "N5", 2),
+    ("N5", "N12", 2.5),
+    ("E2", "Caf3", 2),
+    ("Caf3", "N10", 1),
+    ("MA", "N10", 0.5),
+    ("T2", "N10", 0.5),
+    ("T2", "EE", 0.1),
+    ("N10", "EE", 4),
+    ("N9", "EE", 0.5),
+    ("N9", "N8", 2),
+    ("N8", "N7", 3),
+    ("N7", "MA", 0.5),
+    ("N7", "N6", 5),
+    ("N8", "N13", 2.5),
+    ("N13", "Dorm2", 1),
+    ("N13", "N20", 2.5),
+    ("N20", "N21", 0.5),
+    ("N21", "Dorm3", 1),
+    ("N37", "N19", 2),
+    ("N37", "N20", 8),
+    ("N37", "E1", 0.5),
+    ("N19", "N12", 2.5),
+    ("N19", "N18", 2),
+    ("N18", "N17", 2),
+    ("N18", "T4", 1.5),
+    ("T4", "AU", 1.5),
+    ("AU", "RB", 0.5),
+    ("AU", "T1", 2),
+    ("T1", "RB", 0.1),
+    ("T1", "N24", 0.1),
+    ("T4", "N24", 0.1),
+    ("N19", "N36", 3.5),
+    ("N36", "N25", 3.5),
+    ("N21", "N22", 3),
+    ("N22", "E1", 1),
+    ("N22", "N23", 1),
+    ("N23", "Dorm1", 1),
+    ("N23", "N29", 2.5),
+    ("N29", "N28", 1.5),
+    ("N28", "T3", 0.5),
+    ("N28", "N27", 4),
+    ("N27", "N26", 3),
+    ("N26", "N25", 1.5),
+    ("N27", "S", 1.5),
+    ("N26", "Caf1", 1.5),
+    ("N25", "N30", 2),
+    ("N30", "Caf1", 1),
+    ("S", "N35", 3),
+    ("N35", "Gym", 1),
+    ("N35", "N34", 0.5),
+    ("N34", "IA", 0.5),
+    ("N34", "N33", 2),
+    ("N33", "N31", 3.5),
+    ("N31", "N30", 2.5),
+    ("N31", "Court", 1),
+    ("N24", "Court", 1),
+    ("Court", "TR", 1),
+    ("TR", "N32", 0.5),
+    ("N32", "N33", 2),
+    ("T4", "N36", 1),
+    ("N36", "E1", 1)
+]
 
-class ModernCampusNav(ctk.CTk):
-    def __init__(self):
-        super().__init__()
+edge_waypoints = {
+    tuple(sorted(("T2", "EE"))): [(7, 21)],
+    tuple(sorted(("S", "N35"))): [(-12.5, 11)],
+    tuple(sorted(("Court", "N24"))): [(-14, 7)],
+    tuple(sorted(("TR", "N32"))): [(-19, 7)],
+    tuple(sorted(("T4", "N36"))): [(-6, 7)],
+    tuple(sorted(("E1", "N37"))): [(-6, 11)],
+}
 
-        self.title("Navigation System")
-        self.geometry("1100x750")
-        
-        self.graph = build_graph(nodes, edges) # initialize graph
+positions = {
+    "MainGate": (0, 0),
+    "AD": (0, 7),
+    "AU": (-7, 4),
+    "RB": (-7, 2),
+    "Library": (-4, 3),
+    "T1": (-9.5, 3.5),
+    "T4": (-7, 7),
+    "T2": (7.15, 16),
+    "T3": (-11.5, 17.5),
+    "TR": (-19, 4.5),
+    "EE": (5.5, 21),
+    "MA": (3.75, 16),
+    "IB": (5.5, 2.5),
+    "S": (-12.5, 13.5),
+    "Gym": (-17, 14),
+    "Court": (-14, 5),
+    "IA": (-19, 11),
+    "E1": (-6, 14),
+    "E2": (5.5, 11),
+    "Dorm1": (-7, 21.5),
+    "Dorm2": (0, 21.5),
+    "Dorm3": (-3, 21.5),
+    "Caf1": (-11.5, 10.5),
+    "Caf3": (5.5, 14.5),
 
-        visible_nodes = [n for n in nodes if not n.startswith("N")]
+    "Home": (-17, 21),
 
-        # grid layout
-        self.grid_columnconfigure(1, weight=1) # right side map resizes automatically
-        self.grid_rowconfigure(0, weight=1)
+    "N1": (0, 1),
+    "N2": (2.5, 1),
+    "N3": (2.5, 2.5),
+    "N4": (2.5, 5),
+    "N5": (2.5, 9),
+    "N6": (2.5, 11),
+    "N7": (2.5, 16),
+    "N8": (2.5, 19),
+    "N9": (2.5, 21),
+    "N10": (5.5, 16),
+    "N11": (0, 5),
+    "N12": (0, 9),
+    "N13": (0, 19),
+    "N14": (-2, 1),
+    "N15": (-2, 3),
+    "N16": (-2, 5),
+    "N17": (-2.5, 5),
+    "N18": (-2.5, 7),
+    "N19": (-2.5, 9),
+    "N20": (-2.5, 19),
+    "N21": (-3, 19),
+    "N22": (-6, 19),
+    "N23": (-7, 19),
+    "N24": (-9.5, 7),
+    "N25": (-9.5, 9),
+    "N26": (-9.5, 10.5),
+    "N27": (-9.5, 13.5),
+    "N28": (-9.5, 17.5),
+    "N29": (-9.5, 19),
+    "N30": (-11.5, 9),
+    "N31": (-14, 9),
+    "N32": (-17.5, 7),
+    "N33": (-17.5, 9),
+    "N34": (-17.5, 11),
+    "N35": (-17, 11),
+    "N36": (-6, 9),
+    "N37": (-2.5, 11)
+}
 
-        # side bar
-        self.sidebar_frame = ctk.CTkFrame(self, width=250, corner_radius=0)
-        self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
-        
-        # title
-        self.logo_label = ctk.CTkLabel(self.sidebar_frame, text="NTUST Navigation", 
-                                     font=ctk.CTkFont(size=20, weight="bold"))
-        self.logo_label.pack(padx=20, pady=(20, 10))
+# (width, height)
+node_dims = {
+    "AD": (4, 2),
+    "AU": (1, 1),
+    "Caf1": (1, 1),
+    "Caf3": (1, 1),
+    "Court": (6, 7),
+    "Dorm1": (4, 3),
+    "Dorm3": (2, 3),
+    "Dorm2": (2, 3),
+    "E1": (6, 8),
+    "E2": (5, 2),
+    "EE": (5, 2),
+    "Gym": (4, 4),
+    "IA": (2, 4),
+    "IB": (5, 3),
+    "MA": (1.75, 5),
+    "Library": (2, 4),
+    "RB": (3.75, 2),
+    "S": (3, 5),
+    "T1": (1, 5),
+    "T2": (1.75, 7.25),
+    "T3": (3, 3),
+    "T4": (6, 1.75),
+    "TR": (2, 7),
+    "Home": (2, 2)
+}
 
-        # start point 
-        self.label_start = ctk.CTkLabel(self.sidebar_frame, text="選擇起點:", anchor="w")
-        self.label_start.pack(padx=20, pady=(10, 0), fill="x")
-        self.start_combo = ctk.CTkComboBox(self.sidebar_frame, values=visible_nodes)
-        self.start_combo.pack(padx=20, pady=5)
-        self.start_combo.set(visible_nodes[0]) #default
+categories = {
+    "MainGate": "gate",
+    "Home": "gate",
 
-        # End point 
-        self.label_end = ctk.CTkLabel(self.sidebar_frame, text="選擇終點:", anchor="w")
-        self.label_end.pack(padx=20, pady=(10, 0), fill="x")
-        self.end_combo = ctk.CTkComboBox(self.sidebar_frame, values=visible_nodes)
-        self.end_combo.pack(padx=20, pady=5)
-        self.end_combo.set(nodes[1]) #default
+    "AD": "admin",
+    "S": "admin",
+    "Gym": "admin",
+    "IB": "admin",
+    "T3": "admin",
+    "IA": "admin",
 
-        # calculate btn
-        self.calc_btn = ctk.CTkButton(self.sidebar_frame, text="開始導航", 
-                                    command=self.on_calculate,
-                                    font=ctk.CTkFont(size=15, weight="bold"),
-                                    height=40)
-        self.calc_btn.pack(padx=20, pady=30)
+    "T1": "academic1",
+    "T2": "academic1",
+    "T4": "academic1",
 
-        # output textbox
-        self.result_label = ctk.CTkLabel(self.sidebar_frame, text="導航資訊:", anchor="w")
-        self.result_label.pack(padx=20, pady=(10, 0), fill="x")
-        
-        self.result_text = ctk.CTkTextbox(self.sidebar_frame, height=200)
-        self.result_text.pack(padx=20, pady=(5, 20), fill="both", expand=True)
-        self.result_text.configure(state="disabled")
+    "E1": "academic2",
+    "E2": "academic2",
+    "EE": "academic2",
 
-        # map section
-        self.map_frame = ctk.CTkFrame(self, corner_radius=10)
-        self.map_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+    "MA": "academic3",
+    "RB": "academic3",
+    "TR": "academic3",
 
-        # matplotlib diagram
-        self.fig = Figure(figsize=(6, 6), dpi=100, facecolor='#2b2b2b')
-        self.ax = self.fig.add_subplot(111)
-        self.ax.set_facecolor('#2b2b2b')
-        
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.map_frame)
-        self.canvas.get_tk_widget().pack(side="top", fill="both", expand=True, padx=10, pady=10)
+    "Library": "public",
+    "AU": "public",
 
-        self.draw_map(path=[])
+    "Caf1": "cafeteria",
+    "Caf3": "cafeteria",
 
-    def on_calculate(self):
-        start_node = self.start_combo.get()
-        end_node = self.end_combo.get()
+    "Dorm1": "dorm",
+    "Dorm2": "dorm",
+    "Dorm3": "dorm",
 
-        if start_node == end_node:
-            messagebox.showwarning("Warning", "起點與終點不能相同！")
-            return
+    "Court": "sport"
+}
 
-        dist_map, prev_map = dijkstra(self.graph, start_node)
-        path = reconstruct_path(prev_map, start_node, end_node)
-
-        self.update_result_text(start_node, end_node, path, dist_map[end_node])
-        self.draw_map(path)
-
-    def update_result_text(self, start, end, path, total_dist):
-        self.result_text.configure(state="normal")
-        self.result_text.delete("1.0", "end")
-        
-        if not path:
-            self.result_text.insert("end", f"沒有路徑連結 {start} 與 {end}\n")
-        else:
-            header = f"起點: {start}\n終點: {end}\n距離: {total_dist} m\n\n"
-            self.result_text.insert("end", header)
-
-        
-        self.result_text.configure(state="disabled")
-
-    def draw_map(self, path):
-        self.ax.clear()
-
-        # draw lines
-        def get_plot_points(u, v):
-            start_pos = positions[u]
-            end_pos = positions[v]
-            key = tuple(sorted((u, v)))
-            if key in edge_waypoints:
-                waypoints = edge_waypoints[key]
-                if u == key[1]: waypoints = waypoints[::-1]
-                return [start_pos] + waypoints + [end_pos]
-            return [start_pos, end_pos]
-
-        for u, v, w in edges:
-            points = get_plot_points(u, v)
-            xs = [p[0] for p in points]
-            ys = [p[1] for p in points]
-            self.ax.plot(xs, ys, color='#FFFFFF', linestyle='-', linewidth=1, alpha=0.5)
-
-        # draw rectangles
-        for name in nodes:
-            if name.startswith("N"):
-                continue  # skip invisible nodes
-
-            cx, cy = positions[name]  # center x,y
-            
-            w, h = node_dims.get(name, (1, 1)) #if not set, default is (1,1)
-            
-            # 左下角 coordinate bc Matplotlib starts to draw from 左下角
-            left = cx - (w / 2)
-            bottom = cy - (h / 2)
-            
-            c = color_map.get(categories.get(name), 'gray') #if not set, default is gray
-            
-            rect = Rectangle(
-                (left, bottom), width=w, height=h,
-                facecolor=c,
-                edgecolor='white',
-                linewidth=1,
-                zorder=5
-            )
-            self.ax.add_patch(rect)
-
-            # label
-            self.ax.text(cx, cy, name, 
-                         fontsize=12, color='white', fontweight='bold',
-                         ha='center', va='center', zorder=6)
-
-        # draw the shrotest path
-        if path and len(path) > 1:
-            for i in range(len(path) - 1):
-                u = path[i]
-                v = path[i + 1]
-                points = get_plot_points(u, v)
-                px = [p[0] for p in points]
-                py = [p[1] for p in points]
-                self.ax.plot(px, py, color='#FF0000', linestyle='-', linewidth=4, alpha=0.8, zorder=4)
-
-        self.ax.set_title("Campus Map", fontsize=24, color='white', pad=20)
-        self.ax.axis('off')
-        
-        self.ax.set_aspect('equal') # ratio 1:1
-        self.ax.autoscale_view()
-        
-        self.canvas.draw()
-    
-
-if __name__ == "__main__":
-    app = ModernCampusNav()
-    app.mainloop()
+color_map = {
+    "gate": "black",
+    "admin": "#7DD3E0",
+    "academic1": "#8AB4F8",
+    "academic2": "#B39DDB",
+    "academic3": "#E8A6B8",
+    "public": "#F2B5A7",
+    "cafeteria": "#8FD3B6",
+    "dorm": "#B7D97A",
+    "sport": "#F4C97A"
+}
